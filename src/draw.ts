@@ -1093,11 +1093,14 @@ const planPage = ({ c, m, ui, top, bottom, hit }: PageArgs): Paged => {
     return { maxScroll: 0, spin: [row + shown.spin[0], 1 + shown.spin[1]] }
   }
   const bodyOf = (width: number) => (ui.full ? planFull(m, width) : planSummary(m, width, 'accent', true))
-  // The contents column, when there is room and more than one section to list.
-  const toc = c.width >= 90 && bodyOf(c.width - TOC - 4).heads.length >= 2
+  // The contents column, when there is room and more than one section to list;
+  // the section count is width-independent, so render the narrower width once
+  // and reuse it as the body when the contents column is shown.
+  const narrow = c.width >= 90 ? bodyOf(c.width - TOC - 4) : undefined
+  const toc = narrow !== undefined && narrow.heads.length >= 2
   const col = toc ? TOC + 3 : 1
   const width = c.width - col - 1
-  const body = bodyOf(width)
+  const body = toc ? narrow : bodyOf(width)
   const lead: Line[] = [
     ...reflow([{ text: `${m.planPath}  ·  ${m.hash.replace(/^(sha256:.{8}).*$/, '$1')}  ·  `, tone: 'dim' }, checksOf(m), { text: `  ·  f ${t(ui.full ? 'summary' : 'full text')}`, tone: 'dim' }], width),
     [],

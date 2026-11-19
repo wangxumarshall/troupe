@@ -91,6 +91,8 @@ export class Motion {
   private readonly phase = new Map<string, number>()
   private tick = -Infinity
   private intro: { at: number; end: number } | undefined
+  /** The intro's per-cell arrival schedule, memoized per column: the column is stable between redraws. */
+  private introPlan: { column: NonNullable<Scene['column']>; cells: { row: number; col: number; at: number }[]; last: number } | undefined
   private readonly gradient: boolean
   /** Whether the last frame drew the selected box, whose gradient turns. */
   private turning = false
@@ -359,7 +361,12 @@ export class Motion {
    * each role's box draws itself where the light lands, the reviewer's lanes last. What has not
    * arrived yet is hidden; the rest of the screen fades in.
    */
-  private dispatch(screen: Screen, column: NonNullable<Scene['column']>, e: number, model: PanelModel) {
+  /**
+   * The intro's per-cell arrival times in screen coordinates, plus the time the
+   * last cell arrives. Deterministic for a column, so it is built once and
+   * reused across the intro's frames (the column is stable between redraws).
+   */
+  private schedule(column: NonNullable<Scene['column']>, model: PanelModel): { cells: { row: number; col: number; at: number }[]; last: number } {
     const when = new Map<string, number>()
     const set = ([row, col]: Point, time: number) => {
       const key = `${column.row + row},${column.col + col}`
@@ -391,24 +398,51 @@ export class Motion {
     for (const lane of column.lanes) lane.path.forEach((point, i) => set(point, start + i / 32))
     for (const box of column.boxes.filter(one => lanes.has(one.name))) draws(box, start + Math.max(0, ...column.lanes.map(lane => lane.path.length)) / 32)
     const last = Math.max(...when.values()) + 0.2
+
+    return { cells: [...when].map(([key, at]) => { const [row = 0, col = 0] = key.split(',').map(Number); return { row, col, at } }), last }
+  }
+  private dispatch(screen: Screen, column: NonNullable<Scene['column']>, e: number, model: PanelModel) {
+    if (this.introPlan?.column !== column) this.introPlan = { column, ...this.schedule(column, model) }
+    const { cells, last } = this.introPlan
     const intro = this.intro
     if (intro !== undefined && intro.end === Infinity) intro.end = intro.at + (last + 0.55) * 1000
     const arrive = (cell: Cell, at: number) => {
-      if (e < at) Object.assign(cell, { ch: cell.ch === '' ? '' : ' ', fg: undefined, bg: undefined, bold: undefined })
-      else {
+      if (e < at) {
+        cell.ch = cell.ch === '' ? '' : ' '
+        cell.fg = undefined
+        cell.bg = undefined
+        cell.bold = undefined
+      } else {
         if (e - at < 0.06) cell.ch = HEAVY[cell.ch] ?? cell.ch
         cell.fg = mix(cell.fg ?? this.text, this.strong(), decay(e - at, 0.12))
       }
     }
-    for (let row = 0; row < screen.height; row++) {
-      for (let col = 0; col < screen.width; col++) {
+    const width = screen.width
+    // The named cells arrive on their schedule; the floor around them follows the light.
+    const named = new Set<number>()
+    for (const { row, col, at } of cells) {
+      named.add(row * width + col)
+      const cell = screen.at(row, col)
+      if (cell !== undefined) arrive(cell, at)
+    }
+    const top = Math.max(column.row, column.top)
+    const bottom = Math.min(column.row + column.flow, column.bottom)
+    for (let row = top; row < bottom; row++) {
+      for (let col = column.col; col < width; col++) {
+        if (named.has(row * width + col)) continue
         const cell = screen.at(row, col)
-        if (cell === undefined) continue
-        const flow = row - column.row
-        const at = when.get(`${row},${col}`)
-        if (at !== undefined) arrive(cell, at)
-        else if (flow >= 0 && flow < column.flow && row >= column.top && row < column.bottom && col >= column.col) arrive(cell, last + hash(row, col) * 0.4)
-        else if (e < 0.35) {
+        if (cell !== undefined) arrive(cell, last + hash(row, col) * 0.4)
+      }
+    }
+    // Everything else fades in over the first 0.35s; after that only the column moves.
+    if (e < 0.35) {
+      for (let row = 0; row < screen.height; row++) {
+        for (let col = 0; col < width; col++) {
+          if (named.has(row * width + col)) continue
+          const flow = row - column.row
+          if (flow >= 0 && flow < column.flow && row >= column.top && row < column.bottom && col >= column.col) continue
+          const cell = screen.at(row, col)
+          if (cell === undefined) continue
           cell.fg = mix(this.paper, cell.fg ?? this.text, e / 0.35)
           if (cell.bg !== undefined) cell.bg = mix(this.paper, cell.bg, e / 0.35)
         }

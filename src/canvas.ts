@@ -57,6 +57,12 @@ const within = (code: number, ranges: [number, number][]) => ranges.some(([lo, h
 
 const cellOf = (ch: string) => {
   const code = ch.codePointAt(0) ?? 0
+  // Nearly all panel text is single-cell scripts below the wide/extended
+  // ranges: answer those without scanning the tables. Combining marks
+  // (0x300–0x36f) are the one zero-width band below 0x1100.
+  if (code < 0x300) return 1
+  if (code < 0x370) return 0
+  if (code < 0x1100) return 1
 
   return within(code, ZERO) ? 0 : within(code, WIDE) ? 2 : 1
 }
