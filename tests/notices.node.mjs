@@ -31,10 +31,15 @@ test('the orchestrator is the agent session this command really runs under, not 
   assert.deepEqual(agentSession(r({ CLAUDE_CODE_SESSION_ID: 's1', CLAUDE_PID: '80' })), { harness: 'claude', session: 's1' })
   // A tmux server started from an old Claude shell hands its variables to every pane; that Claude is no ancestor.
   assert.equal(agentSession(r({ CLAUDE_CODE_SESSION_ID: 's1', CLAUDE_PID: '4242' })), undefined)
+  // A Claude that still exports its session id but no longer its pid is found by its process name.
+  assert.deepEqual(agentSession(r({ CLAUDE_CODE_SESSION_ID: 's1' })), { harness: 'claude', session: 's1' })
+  // A leaked session id with no Claude ancestor records nothing.
+  assert.equal(agentSession({ pid: 100, env: { CLAUDE_CODE_SESSION_ID: 's1' }, run: psRun({ 80: 'node' }) }), undefined)
   assert.deepEqual(agentSession({ pid: 100, env: { CODEX_THREAD_ID: 't1' }, run: psRun({ 80: 'codex' }) }), { harness: 'codex', session: 't1' })
   assert.equal(agentSession({ pid: 100, env: { CODEX_THREAD_ID: 't1' }, run: psRun({}) }), undefined)
   // Codex started from inside Claude: the nearer agent runs the command.
   assert.deepEqual(agentSession({ pid: 100, env: { CODEX_THREAD_ID: 't1', CLAUDE_CODE_SESSION_ID: 's1', CLAUDE_PID: '70' }, run: psRun({ 80: 'codex', 70: 'claude' }) }), { harness: 'codex', session: 't1' })
+  assert.deepEqual(agentSession({ pid: 100, env: { CODEX_THREAD_ID: 't1', CLAUDE_CODE_SESSION_ID: 's1' }, run: psRun({ 80: 'codex', 70: 'claude' }) }), { harness: 'codex', session: 't1' })
   assert.deepEqual(callerTarget({ env: { TMUX: 'x', TMUX_PANE: '%7' }, run: () => ({ code: 0, out: '', err: '' }) }), { mux: 'tmux', pane: '%7' })
   assert.deepEqual(callerTarget({ pid: 100, env: { HERDR_ENV: '1', HERDR_PANE_ID: 'w1:p4' }, run: () => ({ code: 1, out: '', err: '' }) }), { mux: 'herdr', pane: 'w1:p4' })
 })

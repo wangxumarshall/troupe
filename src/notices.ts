@@ -41,11 +41,17 @@ const ancestors = (r: Runtime): { pid: number; comm: string }[] => {
 
 /**
  * The agent session this command runs inside. Its variables alone could be stale (a tmux server keeps the
- * environment of the shell that started it), so the agent must also be an ancestor of this process.
+ * environment of the shell that started it), so the agent must also be an ancestor of this process. Claude
+ * Code once exported its pid to match against; the ones still running export only the session id, so the
+ * Claude ancestor is then found by name — the way the codex one always has been (#43, #53).
  */
 export const agentSession = (r: Runtime): { harness: Harness; session: string } | undefined => {
   const chain = ancestors(r)
-  const claude = r.env.CLAUDE_CODE_SESSION_ID && r.env.CLAUDE_PID ? chain.findIndex(one => String(one.pid) === r.env.CLAUDE_PID) : -1
+  const claude = r.env.CLAUDE_CODE_SESSION_ID && r.env.CLAUDE_PID
+    ? chain.findIndex(one => String(one.pid) === r.env.CLAUDE_PID)
+    : r.env.CLAUDE_CODE_SESSION_ID
+      ? chain.findIndex(one => one.comm === 'claude' || one.comm.endsWith('/claude'))
+      : -1
   const codex = r.env.CODEX_THREAD_ID ? chain.findIndex(one => one.comm === 'codex' || one.comm.endsWith('/codex')) : -1
   if (claude < 0 && codex < 0) return undefined
   if (codex < 0 || (claude >= 0 && claude < codex)) return { harness: 'claude', session: r.env.CLAUDE_CODE_SESSION_ID ?? '' }

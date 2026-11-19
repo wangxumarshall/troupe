@@ -19,6 +19,10 @@ import { readPanel } from '../dist/panel-model.js'
 import { ENTER_PANEL, frameOf, LEAVE_PANEL, panel, terminalFrame } from '../dist/panel.js'
 
 const PLAN = '# A mission\n\n```yaml\ngoal: Build the endpoint\nwhy: People need it\nroles:\n  api:\n    agent: fake\n    flags: [--policy, ask]\n    touches: [src/]\n  web:\n    agent: fake\n    flags: [--policy, ask]\n    touches: [web/]\n```\n\n## Done when\n\n- It works.\n\n## Role: api\n\nBuild it.\n\n## Role: web\n\nUse it.\n'
+// A spawned CLI must not see the runner's agent variables: from inside a Claude session a
+// troupe command would record that session as the mission's orchestrator, and this file's
+// spawned-CLI tests assert the log's exact contents.
+const hostless = env => Object.fromEntries(Object.entries(env).filter(([key]) => !/^(CLAUDE|CODEX|HERDR)_|^CLAUDECODE$/.test(key)))
 const ADAPTER = `command: fake
 model: []
 effort: []
@@ -404,7 +408,7 @@ test('CLI panel --once --plain shows the plan gate, then the build after approva
   const m = mission(r, 'm1')
   append(m.log, 'orch', { ev: 'gate-open', gate: 'plan', plan: m.hash })
   const cli = fileURLToPath(new URL('../dist/cli.js', import.meta.url))
-  const run = (...args) => spawnSync(process.execPath, [cli, 'panel', '-m', 'm1', '--plain', '--width', '96', '--height', '58', ...args], { cwd: root, encoding: 'utf8', input: 'a' })
+  const run = (...args) => spawnSync(process.execPath, [cli, 'panel', '-m', 'm1', '--plain', '--width', '96', '--height', '58', ...args], { cwd: root, env: hostless(process.env), encoding: 'utf8', input: 'a' })
   const before = run('--once')
   assert.equal(before.status, 0, before.stderr)
   assert.match(before.stdout, /APPROVE THE PLAN/)
@@ -417,7 +421,7 @@ test('CLI panel --once --plain shows the plan gate, then the build after approva
   assert.doesNotMatch(after.stdout, /APPROVE THE PLAN/)
   assert.match(after.stdout, /FLOW/)
   assert.match(after.stdout, /Build/)
-  const bad = spawnSync(process.execPath, [cli, 'panel', '--width', '0', '--once'], { cwd: root, encoding: 'utf8' })
+  const bad = spawnSync(process.execPath, [cli, 'panel', '--width', '0', '--once'], { cwd: root, env: hostless(process.env), encoding: 'utf8' })
   assert.equal(bad.status, 2)
 })
 
