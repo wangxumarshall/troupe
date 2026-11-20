@@ -16,6 +16,15 @@ Thanks for helping. Issues and pull requests are both welcome.
 ## Working on troupe
 
 ```sh
+./setup.sh   # one-click: prerequisites, npm ci, build, `npm link`, skill, tests
+```
+
+`./setup.sh` takes a fresh clone to a working `troupe` on your PATH. It checks
+prerequisites, installs dependencies, builds and links the command, installs the
+workflow skill for each harness found, and runs `check.sh`. The steps it runs
+are:
+
+```sh
 npm ci
 npm run build && npm link   # your build of `troupe` on the PATH
 ./check.sh                  # type-check, build and run every test
