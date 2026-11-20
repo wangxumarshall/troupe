@@ -20,7 +20,7 @@ profiles:
     agent: claude
     model: opus
     effort: high
-    flags: [--permission-mode, acceptEdits]
+    flags: [--permission-mode, bypassPermissions]
     text: workflow:builder
 roles:                                # 一个角色 = 一个窗口、一个 worktree、一个分支
   api:

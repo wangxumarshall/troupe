@@ -58,7 +58,7 @@ roles:
   assert.equal(web.group, 'build')
 })
 
-test('flags must pin the permission; the account default is never inherited', () => {
+test('claude defaults to bypass; codex still requires an explicitly pinned permission', () => {
   const read = readPlan(
     plan(
       `
@@ -72,7 +72,7 @@ roles:
     touches: [b/]
   c:
     agent: claude
-    flags: [--permission-mode=auto]
+    flags: [--permission-mode=acceptEdits]
     touches: [c/]
   d:
     agent: codex
@@ -83,7 +83,6 @@ roles:
     ),
   )
   assert.deepEqual(read.problems, [
-    "role a: flags must pin claude's permission (--permission-mode or --dangerously-skip-permissions)",
     "role b: flags must pin codex's permission (-s or --sandbox or --dangerously-bypass-approvals-and-sandbox)",
   ])
 })
@@ -197,7 +196,7 @@ test('troupe check: clean, problems, and no plan', () => {
   const clean = run()
   assert.equal(clean.status, 0, clean.stdout)
   assert.match(clean.stdout, /clean \(3 roles: api, web, review\)/)
-  writeFileSync(join(repo, 'bad.md'), plan(`roles:\n  a:\n    agent: claude\n    touches: []\n    text: docs/a.md`))
+  writeFileSync(join(repo, 'bad.md'), plan(`roles:\n  a:\n    agent: codex\n    touches: []\n    text: docs/a.md`))
   const bad = run('bad.md')
   assert.equal(bad.status, 1)
   assert.match(bad.stdout, /bad\.md: 2 problems/)

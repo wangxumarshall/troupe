@@ -176,7 +176,7 @@ export const checkRoles = (roles: Role[], agents: Record<string, Agent>, keys = 
     const agent = agents[role.agent]
     if (role.agent === '') problems.push(`role ${name}: no agent`)
     else if (agent === undefined) problems.push(`role ${name}: unknown agent "${role.agent}" (${Object.keys(agents).join(', ')})`)
-    else {
+    else if ((agent.defaultPermission?.length ?? 0) === 0) {
       const unset = unsetPermission(agent, role.flags)
       if (unset.length > 0) problems.push(`role ${name}: flags must pin ${role.agent}'s permission (${unset.join('; ')})`)
     }

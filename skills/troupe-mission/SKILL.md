@@ -74,10 +74,11 @@ tells you in a line.
   Fewer, fuller roles beat many thin ones: each is a window the person
   watches.
 - **Each role says who runs it**: `agent` (`claude`, `codex`, or an adapter
-  in `.troupe/agents/`), `model`, `effort`, and `flags`, which must pin its
-  permission (Claude Code: `--permission-mode acceptEdits`; Codex:
-  `-a on-request -s workspace-write`). Propose; the person decides at the
-  gate. Propose a bypass mode only when the person asks for one.
+  in `.troupe/agents/`), `model`, `effort`, and `flags`. Claude Code roles
+  default to `--permission-mode bypassPermissions`; an explicit
+  `--permission-mode <mode>` overrides it. Codex must pin its own permission
+  (`-a on-request -s workspace-write`). Propose; the person decides at the
+  gate.
   For Codex `workspace-write`, dispatch adds `--add-dir` for its Git index,
   shared objects and the mission's refs/reflogs. This permits commits, not
   writes to the main branch; roles still share the mission refs and objects.

@@ -39,7 +39,7 @@ profiles:                       # settings several roles share; a role's own fie
     agent: claude
     model: opus
     effort: high
-    flags: [--permission-mode, acceptEdits]
+    flags: [--permission-mode, bypassPermissions]
     text: workflow:builder      # the workflow's builder rules, then the role's section
   codex-build:
     agent: codex
@@ -62,7 +62,7 @@ roles:                          # one role = one window, one worktree, one branc
     agent: claude
     model: sonnet
     effort: high
-    flags: [--permission-mode, acceptEdits]
+    flags: [--permission-mode, bypassPermissions]
     goal: "Review each branch as it lands"
     touches: []                 # changes no files
     reviews: [api, web]
@@ -70,9 +70,10 @@ roles:                          # one role = one window, one worktree, one branc
 ```
 
 Each role names its `agent` (`claude`, `codex`, or an adapter in
-`.troupe/agents/`) and its own `flags`, which must pin the agent's permission
-(Claude Code: `--permission-mode`; Codex: `-a` and `-s`): a role never
-inherits it. `model` and `effort` are passed as written. Keep each value on
+`.troupe/agents/`) and its own `flags`. Claude Code roles default to
+`--permission-mode bypassPermissions`; an explicit `--permission-mode <mode>`
+overrides it. Codex must pin `-a` and `-s`. `model` and `effort` are passed
+as written. Keep each value on
 one line. If a role turns out to need a file it did not declare, update this
 plan; a changed plan is approved again before the next dispatch.
 

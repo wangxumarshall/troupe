@@ -31,6 +31,8 @@ export type Agent = {
   effort: string[]
   /** Each group is one setting, satisfied by any flag in that group. */
   permission: string[][]
+  /** Injected before a role's flags when none of them pin a permission; empty means no default. */
+  defaultPermission?: string[]
   prompt: 'last-arg'
   screen: Record<Exclude<Screen, 'unknown'>, string[]>
   paste: 'bracketed'
@@ -45,6 +47,7 @@ export const AGENTS: Record<string, Agent> = Object.assign(Object.create(null) a
     modelEnv: 'ANTHROPIC_MODEL',
     effort: ['--effort', '{effort}'],
     permission: [['--permission-mode', '--dangerously-skip-permissions']],
+    defaultPermission: ['--permission-mode', 'bypassPermissions'],
     prompt: 'last-arg',
     screen: {
       waits: ['Is this a project you created or one you trust\\?', 'Do you want to proceed\\?'],
@@ -98,15 +101,20 @@ const expand = (template: string[], key: string, value: string): string[] =>
   value === '' ? [] : template.map(arg => arg.replaceAll(`{${key}}`, () => value))
 
 /** An argv array, never shell text; omitted role settings add no arguments; `extra` comes before the role's flags. */
-export const argvOf = (agent: Agent, role: Pick<Role, 'model' | 'effort' | 'flags'>, prompt: string, writable: string[] = [], extra: string[] = []): string[] => [
-  agent.command,
-  ...expand(agent.model, 'model', role.model),
-  ...expand(agent.effort, 'effort', role.effort),
-  ...extra,
-  ...role.flags,
-  ...writable.flatMap(path => ['--add-dir', path]),
-  prompt,
-]
+export const argvOf = (agent: Agent, role: Pick<Role, 'model' | 'effort' | 'flags'>, prompt: string, writable: string[] = [], extra: string[] = []): string[] => {
+  const pinned = optionOf(role.flags, agent.permission.flat()) !== undefined
+  const defaultPermission = pinned ? [] : (agent.defaultPermission ?? [])
+  return [
+    agent.command,
+    ...expand(agent.model, 'model', role.model),
+    ...expand(agent.effort, 'effort', role.effort),
+    ...extra,
+    ...defaultPermission,
+    ...role.flags,
+    ...writable.flatMap(path => ['--add-dir', path]),
+    prompt,
+  ]
+}
 
 /** Blank terminal rows do not push a dialog out of the last 15 lines. */
 export const screenOf = (agent: Agent, captured: string): Screen => {
@@ -120,7 +128,7 @@ export const screenOf = (agent: Agent, captured: string): Screen => {
 
 type Map = { [key: string]: Yaml }
 const isMap = (value: Yaml | undefined): value is Map => typeof value === 'object' && value !== null && !Array.isArray(value)
-const KEYS = ['command', 'model', 'modelEnv', 'effort', 'permission', 'prompt', 'screen', 'paste', 'badge', 'usage']
+const KEYS = ['command', 'model', 'modelEnv', 'effort', 'permission', 'defaultPermission', 'prompt', 'screen', 'paste', 'badge', 'usage']
 const STATES = ['waits', 'working', 'ready'] as const
 
 const lineOf = (source: string, field: string): number => {
@@ -160,6 +168,7 @@ const readAgent = (source: string): Agent => {
 
     return flags
   })
+  const defaultPermission = data.defaultPermission === undefined ? undefined : strings(data.defaultPermission, 'defaultPermission')
   if (data.prompt !== 'last-arg') return fail('prompt', 'must be last-arg')
   if (data.paste !== 'bracketed') return fail('paste', 'must be bracketed')
   const envName = (value: Yaml | undefined, field: string): string | undefined => {
@@ -194,7 +203,7 @@ const readAgent = (source: string): Agent => {
     badge = { glyph: data.badge.glyph, tone: data.badge.tone as Tone }
   }
 
-  return { command: data.command, model, effort, permission, prompt: data.prompt, screen, paste: data.paste, ...(badge && { badge }), ...(usage === undefined ? {} : { usage }), ...(modelEnv === undefined ? {} : { modelEnv }) }
+  return { command: data.command, model, effort, permission, prompt: data.prompt, screen, paste: data.paste, ...(badge && { badge }), ...(usage === undefined ? {} : { usage }), ...(modelEnv === undefined ? {} : { modelEnv }), ...(defaultPermission === undefined ? {} : { defaultPermission }) }
 }
 
 /** Files replace an adapter in full: built-ins, then home, then repository. Problems must be resolved before use. */

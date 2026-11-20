@@ -72,8 +72,9 @@ test('argvOf pins the requested model, effort and raw role flags for each harnes
   assert.deepEqual(argvOf(AGENTS.claude, claude, prompt), ['claude', '--model', 'haiku', '--effort', 'low', ...claude.flags, prompt])
   assert.deepEqual(argvOf(AGENTS.codex, codex, prompt), ['codex', '-m', 'gpt-6.1-sol', '-c', 'model_reasoning_effort="high"', ...codex.flags, prompt])
   for (const agent of Object.values(AGENTS)) {
-    assert.deepEqual(argvOf(agent, { model: '', effort: '', flags: ['--policy=ask'] }, ''), [agent.command, '--policy=ask', ''])
-    assert.deepEqual(argvOf(agent, { model: '', effort: 'low', flags: [] }, prompt), [agent.command, ...agent.effort.map(arg => arg.replace('{effort}', 'low')), prompt])
+    const defaults = agent.defaultPermission ?? []
+    assert.deepEqual(argvOf(agent, { model: '', effort: '', flags: ['--policy=ask'] }, ''), [agent.command, ...defaults, '--policy=ask', ''])
+    assert.deepEqual(argvOf(agent, { model: '', effort: 'low', flags: [] }, prompt), [agent.command, ...agent.effort.map(arg => arg.replace('{effort}', 'low')), ...defaults, prompt])
   }
 })
 
@@ -82,7 +83,7 @@ test('argv templates preserve literal caller text and do not mutate the role', (
   const before = structuredClone(role)
   const agent = { ...AGENTS.claude, command: '/a path/harness', model: ['--model={model}:{model}'] }
   const prompt = 'A prompt\nwith "quotes" and $(literal text)'
-  assert.deepEqual(argvOf(agent, role, prompt), [agent.command, `--model=${role.model}:${role.model}`, '--policy', 'ask', prompt])
+  assert.deepEqual(argvOf(agent, role, prompt), [agent.command, `--model=${role.model}:${role.model}`, '--permission-mode', 'bypassPermissions', '--policy', 'ask', prompt])
   assert.deepEqual(role, before)
   assert.deepEqual(unsetPermission(AGENTS.codex, ['--ask-for-approval=never']), ['-s or --sandbox or --dangerously-bypass-approvals-and-sandbox'])
   assert.deepEqual(unsetPermission(AGENTS.codex, ['--dangerously-bypass-approvals-and-sandbox']), [])

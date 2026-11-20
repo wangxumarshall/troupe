@@ -21,7 +21,7 @@ profiles:
     agent: claude
     model: opus
     effort: high
-    flags: [--permission-mode, acceptEdits]
+    flags: [--permission-mode, bypassPermissions]
     text: workflow:builder
 roles:                                # one role = one window, worktree and branch
   api:
