@@ -10,34 +10,34 @@
     ○ beta        ⬢    —   │              ▼             │         ▼       │
   └ ○ zeta        ⬢    —   │      ╔══════════════╗      │ ┌──────────────┐│
     ○ gamma       ⬢    —   │      ║ ○ a… planned ║      │ │ ○ g… planned ││
-    ○ delta       ⬢    —   │      ║ ⬢ codex gpt… ║      │ │ ⬢ codex gpt… ││
+    ○ delta       ⬢    —   │      ║ ⬢ gpt-6.1-s… ║      │ │ ⬢ gpt-6.1-s… ││
     ○ review      ✻    —   │      ║ ◼◼◼◻◻ high   ║      │ │ ◼◼◼◻◻ high   ││
                            │      ╚══════════════╝      │ └──────────────┘│
 ─ STAGES ───────────────── │        ╎                   │                 │
   ✓ Plan                   │        └after alp…╌▼       │                 ▼
   ✓ Plan OK?        10:42  │            ┌──────────────┐│       ┌──────────────┐
   ● Build             0/3  │            │ ○ e… planned ││       │ ○ d… planned │
-  ○ Review            0/1  │            │ ⬢ codex gpt… ││       │ ⬢ codex gpt… │
+  ○ Review            0/1  │            │ ⬢ gpt-6.1-s… ││       │ ⬢ gpt-6.1-s… │
   ◇ MR OK?                 │            │ ◼◼◼◻◻ high   ││       │ ◼◼◼◻◻ high   │
   ○ Open MR                │            └──────────────┘│       └──────────────┘
   ◇ Merged?                │                            │
   ○ Teardown               │                            ▼
                            │                  ┌──────────────┐
 ─ ACTIVITY ─────────────── │                  │ ○ b… planned │
- 12:07 dispatched store    │                  │ ⬢ codex gpt… │
+ 12:07 dispatched store    │                  │ ⬢ gpt-6.1-s… │
  12:07 dispatched api      │                  │ ◼◼◼◻◻ high   │
  10:42 stage: build        │                  └──────────────┘
  10:42 plan approved       │                    ╎
  10:41 plan gate opened    │                    └after beta╌▼
                            │                        ┌──────────────┐
                            │                        │ ○ z… planned │
-                           │                        │ ⬢ codex gpt… │
+                           │                        │ ⬢ gpt-6.1-s… │
                            │                        │ ◼◼◼◻◻ high   │
                            │                        └──────────────┘
                            │
                            │      ┌──────────────┐
                            │      │ ○ r… planned │
-                           │      │ ✻ claude op… │
+                           │      │ ✻ opus       │
                            │      │ ◼◼◼◻◻ high   │
                            │      │ reviews      │
                            │      │ alpha, beta  │
@@ -48,7 +48,7 @@
                            │ ─ ○ alpha · planned ───────────────────────────────
                            │  goal     Rotate the token on refresh; refuse a
                            │           reused one with 401 reuse
-                           │  agent    ⬢ codex gpt-6.1-sol   ◼◼◼◻◻ high
+                           │  agent    ⬢ gpt-6.1-sol   ◼◼◼◻◻ high
                            │           -a on-request -s workspace-write
                            │  branch   role/demo/alpha
                            │  touches  src/alpha.ts

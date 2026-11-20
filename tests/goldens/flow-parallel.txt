@@ -10,14 +10,14 @@
     ○ timing      ⬢    —   │                ▼                       ▼                       ▼                       ▼                       ▼
     ○ docs        ⬢    —   │      ╔══════════════════╗    ┌──────────────────┐    ┌──────────────────┐    ┌──────────────────┐    ┌──────────────────┐
     ○ seed        ⬢    —   │      ║ ○ panel  planned ║    │ ○ comma… planned │    │ ○ timing planned │    │ ○ docs   planned │    │ ○ seed   planned │
-                           │      ║ ⬢ codex gpt-6.1… ║    │ ⬢ codex gpt-6.1… │    │ ⬢ codex gpt-6.1… │    │ ⬢ codex gpt-6.1… │    │ ⬢ codex gpt-6.1… │
+                           │      ║ ⬢ gpt-6.1-sol    ║    │ ⬢ gpt-6.1-sol    │    │ ⬢ gpt-6.1-sol    │    │ ⬢ gpt-6.1-sol    │    │ ⬢ gpt-6.1-sol    │
 ─ STAGES ───────────────── │      ║ ◼◼◼◻◻ high       ║    │ ◼◼◼◻◻ high       │    │ ◼◼◼◻◻ high       │    │ ◼◼◼◻◻ high       │    │ ◼◼◼◻◻ high       │
   ✓ Plan                   │      ╚══════════════════╝    └──────────────────┘    └──────────────────┘    └──────────────────┘    └──────────────────┘
   ✓ Plan OK?        10:42  │
   ● Build             0/3  │
   ○ Review            0/1  │ ─ ○ panel · planned ─────────────────────────────────────────────────────────────────────────────────────────────────────
   ◇ MR OK?                 │  goal     Rotate the token on refresh; refuse a reused one with 401 reuse
-  ○ Open MR                │  agent    ⬢ codex gpt-6.1-sol   ◼◼◼◻◻ high
+  ○ Open MR                │  agent    ⬢ gpt-6.1-sol   ◼◼◼◻◻ high
   ◇ Merged?                │           -a on-request -s workspace-write
   ○ Teardown               │  branch   role/demo/panel
                            │  touches  src/panel.ts

@@ -17,16 +17,16 @@
 │   ✻ store ──────────────────┘                                                                │
 │   4 windows · codex ×1 · claude ×3 · touches don't overlap ✓                                 │
 │                                                                                              │
-│  ⬢ api        codex gpt-6.1-sol   ◼◼◼◻◻ high    starts at once                               │
+│  ⬢ api        gpt-6.1-sol         ◼◼◼◻◻ high    starts at once                               │
 │    Rotate the token on refresh; refuse a reused one with 401 reuse                           │
 │    src/api/refresh.ts  src/api/errors.ts                                                     │
-│  ✻ store      claude opus         ◼◼◼◻◻ high    starts at once                               │
+│  ✻ store      opus                ◼◼◼◻◻ high    starts at once                               │
 │    Keep a token family and a used flag per token                                             │
 │    src/store/  migrations/                                                                   │
-│  ✻ web        claude sonnet       ◼◼◻◻◻ medium  after api                                    │
+│  ✻ web        sonnet              ◼◼◻◻◻ medium  after api                                    │
 │    Sign the user out when a refresh is refused                                               │
 │    web/src/session/                                                                          │
-│  ✻ review     claude sonnet       ◼◼◼◻◻ high    as each lands                                │
+│  ✻ review     sonnet              ◼◼◼◻◻ high    as each lands                                │
 │    Review each branch as it lands                                                            │
 │    changes nothing                                                                           │
 │                                                                                              │
@@ -48,7 +48,7 @@
     ○ store       ✻    —   │                   ▼                                   ▼
  review                    │      ╔════════════════════════╗          ┌────────────────────────┐
     ○ review      ✻    —   │      ║ ○ api          planned ║          │ ○ store        planned │
-                           │      ║ ⬢ codex gpt-6.1-sol    ║          │ ✻ claude opus          │
+                           │      ║ ⬢ gpt-6.1-sol          ║          │ ✻ opus                 │
 ─ STAGES ───────────────── │      ║ ◼◼◼◻◻ high             ║          │ ◼◼◼◻◻ high             │
   ✓ Plan                   │      ╚════════════════════════╝          └────────────────────────┘
   ◆ Plan OK?               │        ╎

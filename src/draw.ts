@@ -457,12 +457,12 @@ const planSummary = (m: PanelModel, width: number, tone: Tone, page: boolean): {
   const placed = new Set<string>()
   m.roles.forEach((role, index) => {
     if (index > 0 && page) lines.push([])
-    const agent = `${role.agent} ${effectiveModel(role) || t('default')}`
+    const model = effectiveModel(role) || t('unknown')
     const look = LOOK[role.state]
     lines.push([
       { text: ' ' }, badge(role), { text: ' ' },
       { text: fit(role.name, 11), tone: 'bright', bold: true },
-      { text: fit(agent, 20), tone: 'dim' },
+      { text: fit(model, 20), tone: 'dim' },
       ...fitRuns(effortOf(role.effort), EFFORT + 2),
       role.state === 'planned' ? { text: fit(startOf(role), Math.max(0, width - 48)), tone: 'dim' } : { text: fit(`${look.glyph} ${t(look.text)}`, Math.max(0, width - 48)), tone: look.tone },
     ])
@@ -633,7 +633,7 @@ const flow = (m: PanelModel, ui: Ui, width: number): Flow => {
     const h = HEIGHT + notes.length
     canvas.box(row, col, w, h, selected ? look.tone : role.state === 'planned' ? 'chrome' : look.tone, selected ? DOUBLE : SINGLE)
     canvas.put(row + 1, col + 2, spread(`${look.glyph} ${role.name}`, t(look.text), w - 4), { tone: look.tone, ...(selected && { bold: true }) })
-    canvas.runs(row + 2, col + 2, [badge(role), { text: ` ${fit(`${role.agent} ${effectiveModel(role) || t('default')}`, w - 6)}`, tone: 'dim' }])
+    canvas.runs(row + 2, col + 2, [badge(role), { text: ` ${fit(`${effectiveModel(role) || t('unknown')}`, w - 6)}`, tone: 'dim' }])
     const ctx = contextOf(role) === '—' ? '' : `${t('ctx')} ${contextOf(role)}`
     canvas.runs(row + 3, col + 2, [...fitRuns(effortOf(role.effort), w - 4 - cellsOf(ctx)), { text: ctx, tone: 'dim' }])
     notes.forEach((one, index) => canvas.put(row + 4 + index, col + 2, one, { tone: 'dim' }))
@@ -815,7 +815,7 @@ const detail = (role: RoleView, width: number, room: number): { lines: Line[]; k
   const field = (name: Phrase, text: string, tone?: Tone) =>
     wrap(text, width - 10).slice(0, 2).forEach((one, index) => lines.push([{ text: fit(index === 0 ? ` ${t(name)}` : '', 10), tone: 'dim' }, { text: one, ...(tone && { tone }) }]))
   field('goal', role.goal)
-  lines.push([{ text: fit(` ${t('agent')}`, 10), tone: 'dim' }, badge(role), { text: ` ${role.agent} ${effectiveModel(role) || t('default')}   ` }, ...effortOf(role.effort)])
+  lines.push([{ text: fit(` ${t('agent')}`, 10), tone: 'dim' }, badge(role), { text: ` ${effectiveModel(role) || t('unknown')}   ` }, ...effortOf(role.effort)])
   if (role.tokens !== undefined) lines.push([{ text: fit(` ${t('context')}`, 10), tone: 'dim' }, ...contextBar(role, 16), { text: `   ${tokensOf(role)}`, tone: 'dim' }])
   lines.push([{ text: fit('', 10) }, { text: fit(role.flags.join(' '), width - 10), tone: 'accent' }])
   const commits = role.work?.commits.length ?? 0
@@ -1122,7 +1122,7 @@ const card = (role: RoleView, width: number, selected: boolean, seed: number): {
     ]],
   ]
   const right: [Phrase, Line][] = [
-    ['agent', [badge(role), { text: ` ${role.agent} ${effectiveModel(role) || t('default')}` }]],
+    ['agent', [badge(role), { text: ` ${effectiveModel(role) || t('unknown')}` }]],
     ['time', role.elapsed === undefined ? [{ text: '—', tone: 'dim' }] : [{ text: role.elapsed }, { text: t(' since dispatch'), tone: 'dim' }]],
     ['branch', [{ text: role.branch }]],
     ['flags', [{ text: role.flags.join(' ') || '—', tone: role.flags.length === 0 ? 'dim' : 'accent' }]],

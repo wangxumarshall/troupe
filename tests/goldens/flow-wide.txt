@@ -10,21 +10,21 @@
     ○ review      ✻    —   │                   ▼
                            │      ┌────────────────────────┐
 ─ STAGES ───────────────── │      │ ✓ lock            done │
-  ✓ Plan                   │      │ ⬢ codex gpt-6.1-sol    │
+  ✓ Plan                   │      │ ⬢ gpt-6.1-sol          │
   ✓ Plan OK?        10:42  │      │ ◼◼◼◻◻ high             │
   ● Build             0/3  │      └────────────────────────┘
   ○ Review            0/1  │        │          └──────────────────────────────────────────────────────────────────────────┐
   ◇ MR OK?                 │        └───────────────────────────────────────────────────────────after lock─▼              │
   ○ Open MR                │                                                                  ╔════════════════════════╗  │   ┌──────────────────────┐
   ◇ Merged?                │                                                                  ║ ○ build        planned ║  │   │ ○ review     planned │
-  ○ Teardown               │                                                                  ║ ⬢ codex gpt-6.1-sol    ║  ├──▶│ ✻ claude opus        │
+  ○ Teardown               │                                                                  ║ ⬢ gpt-6.1-sol          ║  ├──▶│ ✻ opus               │
                            │                                                                  ║ ◼◼◼◻◻ high             ║  │   │ ◼◼◼◻◻ high           │
 ─ ACTIVITY ─────────────── │                                                                  ╚════════════════════════╝  │   └──────────────────────┘
  12:07 dispatched store    │                                                                               └──────────────┘
  12:07 dispatched api      │
  10:42 stage: build        │ ─ ○ build · planned ─────────────────────────────────────────────────────────────────────────────────────────────────────
  10:42 plan approved       │  goal     Rotate the token on refresh; refuse a reused one with 401 reuse
- 10:41 plan gate opened    │  agent    ⬢ codex gpt-6.1-sol   ◼◼◼◻◻ high
+ 10:41 plan gate opened    │  agent    ⬢ gpt-6.1-sol   ◼◼◼◻◻ high
                            │           -a on-request -s workspace-write
                            │  branch   role/demo/build
                            │  touches  src/build.ts

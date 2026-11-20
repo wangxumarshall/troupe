@@ -10,20 +10,20 @@
 ▸   ○ review      ✻    —   │                   ▼
                            │      ┌────────────────────────┐
 ─ STAGES ───────────────── │      │ ✓ lock            done │
-  ✓ Plan                   │      │ ⬢ codex gpt-6.1-sol    │
+  ✓ Plan                   │      │ ⬢ gpt-6.1-sol          │
   ✓ Plan OK?        10:42  │      │ ◼◼◼◻◻ high             │
   ● Build             0/3  │      └────────────────────────┘
   ○ Review            0/1  │        │
   ◇ MR OK?                 │        └─────────────────after lock─▼
   ○ Open MR                │                        ┌────────────────────────┐
   ◇ Merged?                │                        │ ○ build        planned │
-  ○ Teardown               │                        │ ⬢ codex gpt-6.1-sol    │
+  ○ Teardown               │                        │ ⬢ gpt-6.1-sol          │
                            │                        │ ◼◼◼◻◻ high             │
 ─ ACTIVITY ─────────────── │                        └────────────────────────┘
  12:07 dispatched store    │
  12:07 dispatched api      │      ╔════════════════════════╗
  10:42 stage: build        │      ║ ○ review       planned ║
- 10:42 plan approved       │      ║ ✻ claude opus          ║
+ 10:42 plan approved       │      ║ ✻ opus                 ║
  10:41 plan gate opened    │      ║ ◼◼◼◻◻ high             ║
                            │      ║ reviews lock, build as ║
                            │      ║ each lands             ║
@@ -34,7 +34,7 @@
                            │ ─ ○ review · planned ────────────────────────────
                            │  goal     Rotate the token on refresh; refuse a
                            │           reused one with 401 reuse
-                           │  agent    ✻ claude opus   ◼◼◼◻◻ high
+                           │  agent    ✻ opus   ◼◼◼◻◻ high
                            │           -a on-request -s workspace-write
                            │  branch   role/demo/review
                            │  touches  — changes nothing

@@ -10,27 +10,27 @@
     ○ p2          ⬢    —   │              ▼       │         ▼       │     │
     ○ p3          ⬢    —   │      ╔══════════════╗│ ┌──────────────┐│     │
     ○ p4          ⬢    —   │      ║ ○ p0 planned ║│ │ ○ p3 planned ││     │
-    ○ p5          ⬢    —   │      ║ ⬢ codex gpt… ║│ │ ⬢ codex gpt… ││     │
+    ○ p5          ⬢    —   │      ║ ⬢ gpt-6.1-s… ║│ │ ⬢ gpt-6.1-s… ││     │
     ○ review      ✻    —   │      ║ ◼◼◼◻◻ high   ║│ │ ◼◼◼◻◻ high   ││     │
                            │      ╚══════════════╝│ └──────────────┘│     │
 ─ STAGES ───────────────── │                      │                 │     │
   ✓ Plan                   │                      ▼                 ▼     │
   ✓ Plan OK?        10:42  │            ┌──────────────┐  ┌──────────────┐│
   ● Build             0/3  │            │ ○ p1 planned │  │ ○ p4 planned ││
-  ○ Review            0/1  │            │ ⬢ codex gpt… │  │ ⬢ codex gpt… ││
+  ○ Review            0/1  │            │ ⬢ gpt-6.1-s… │  │ ⬢ gpt-6.1-s… ││
   ◇ MR OK?                 │            │ ◼◼◼◻◻ high   │  │ ◼◼◼◻◻ high   ││
   ○ Open MR                │            └──────────────┘  └──────────────┘│
   ◇ Merged?                │                                              │
   ○ Teardown               │                          ▼───────────────────▼
                            │                  ┌──────────────┐  ┌──────────────┐
 ─ ACTIVITY ─────────────── │                  │ ○ p2 planned │  │ ○ p5 planned │
- 12:07 dispatched store    │                  │ ⬢ codex gpt… │  │ ⬢ codex gpt… │
+ 12:07 dispatched store    │                  │ ⬢ gpt-6.1-s… │  │ ⬢ gpt-6.1-s… │
  12:07 dispatched api      │                  │ ◼◼◼◻◻ high   │  │ ◼◼◼◻◻ high   │
  10:42 stage: build        │                  └──────────────┘  └──────────────┘
  10:42 plan approved       │
  10:41 plan gate opened    │      ┌──────────────┐
                            │      │ ○ r… planned │
-                           │      │ ✻ claude op… │
+                           │      │ ✻ opus       │
                            │      │ ◼◼◼◻◻ high   │
                            │      │ reviews p0,  │
                            │      │ p1 as each   │
@@ -41,7 +41,7 @@
                            │ ─ ○ p0 · planned ──────────────────────────────────
                            │  goal     Rotate the token on refresh; refuse a
                            │           reused one with 401 reuse
-                           │  agent    ⬢ codex gpt-6.1-sol   ◼◼◼◻◻ high
+                           │  agent    ⬢ gpt-6.1-sol   ◼◼◼◻◻ high
                            │           -a on-request -s workspace-write
                            │  branch   role/demo/p0
                            │  touches  src/p0.ts

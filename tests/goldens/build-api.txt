@@ -11,20 +11,20 @@
     ● store       ✻    —   │                   ▼                                   ▼
  review                    │      ╔════════════════════════╗          ┌────────────────────────┐
     ○ review      ✻    —   │      ║ ◆ api     waits on you ║          │ ● store        working │
-                           │      ║ ⬢ codex gpt-6.1-sol    ║          │ ✻ claude opus          │
+                           │      ║ ⬢ gpt-6.1-sol          ║          │ ✻ opus                 │
 ─ STAGES ───────────────── │      ║ ◼◼◼◻◻ high             ║          │ ◼◼◼◻◻ high             │
   ✓ Plan                   │      ╚════════════════════════╝          └────────────────────────┘
   ✓ Plan OK?        10:42  │        ╎
   ● Build             0/3  │        └╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌after api╌▼
   ○ Review            0/1  │                        ┌────────────────────────┐
   ◇ MR OK?                 │                        │ ○ web          planned │
-  ○ Open MR                │                        │ ✻ claude sonnet        │
+  ○ Open MR                │                        │ ✻ sonnet               │
   ◇ Merged?                │                        │ ◼◼◻◻◻ medium           │
   ○ Teardown               │                        └────────────────────────┘
                            │
 ─ ACTIVITY ─────────────── │      ┌────────────────────────┐
  12:07 dispatched store    │      │ ○ review       planned │
- 12:07 dispatched api      │      │ ✻ claude sonnet        │
+ 12:07 dispatched api      │      │ ✻ sonnet               │
  10:42 stage: build        │      │ ◼◼◼◻◻ high             │
  10:42 plan approved       │      │ reviews api, store,    │
  10:41 plan gate opened    │      │ web as each lands      │
@@ -35,7 +35,7 @@
                            │ ─ ◆ api · waits on you ────────────────────────────────────────────
                            │  goal     Rotate the token on refresh; refuse a reused one with 401
                            │           reuse
-                           │  agent    ⬢ codex gpt-6.1-sol   ◼◼◼◻◻ high
+                           │  agent    ⬢ gpt-6.1-sol   ◼◼◼◻◻ high
                            │           -a on-request -s workspace-write
                            │  branch   role/auth-refresh/api
                            │  touches  src/api/refresh.ts src/api/errors.ts

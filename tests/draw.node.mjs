@@ -512,13 +512,13 @@ test('ROLES: a full-width card per role, stacked: name and state in the top bord
   const p = facts(panel)
   assert.deepEqual(Object.keys(p), ['effort', 'agent', 'ctx', 'time', 'tokens', 'branch', 'work', 'flags'])
   assert.equal(p.effort, '◼◼◼◻◻ high')
-  assert.equal(p.agent, '⬢ codex gpt-6.1-sol')
+  assert.equal(p.agent, '⬢ gpt-6.1-sol')
   assert.equal(p.work, '1 commit · 2 files ✗ 1 outside')
   assert.equal(p.time, '5m 12s since dispatch')
   assert.equal(p.flags, '-a on-request -s workspace-write')
   assert.match(lines[panel + 5], /║ ◆ waits on you · Trust this folder\? +o open +║$/, 'the band says what it waits on')
   const c = facts(commands)
-  assert.equal(c.agent, '⬢ codex default')
+  assert.equal(c.agent, '⬢ unknown')
   assert.equal(c.effort, 'unusual')
   assert.match(lines[commands + 5], /│ ✓ Safe cleanup +│$/)
   const r = facts(review)
@@ -695,7 +695,7 @@ test('models carry optional adapter badges into role views', () => {
   assert.deepEqual(m.roles[0].badge, { glyph: 'C', tone: 'warn' })
 })
 
-test('the model a role runs with: the plan\'s, else its agent\'s model env var, else default', () => {
+test('the model a role runs with: the plan\'s, else its agent\'s model env var, else unknown', () => {
   const source = `# Demo\n\n## Role: bot\n\nBuild it.\n\n\`\`\`yaml\nroles:\n  bot:\n    agent: claude\n    goal: build\n    touches: [src/]\n    flags: [--dangerously-skip-permissions]\n\`\`\`\n`
   const base = { mission: 'demo', planPath: 'plan.md', planText: source, plan: readPlan(source), hash: HASH, folded: fold([]), log: [], live: new Map(), stages: DEFAULT_STAGES, now: new Date(at('12:07')) }
   const withEnv = modelOf({ ...base, env: { ANTHROPIC_MODEL: 'opus-4-8' } })
@@ -707,10 +707,12 @@ test('the model a role runs with: the plan\'s, else its agent\'s model env var, 
   assert.equal(effectiveModel(modelOf({ ...base, plan: pinned }).roles[0]), 'sonnet')
   assert.equal(effectiveModel(modelOf({ ...base, env: {} }).roles[0]), '')
   assert.equal(effectiveModel(modelOf({ ...base, agents: { claude: { ...AGENTS.claude, modelEnv: undefined } }, env: { ANTHROPIC_MODEL: 'opus-4-8' } }).roles[0]), '')
-  // The panel shows the model the role runs with, not the placeholder.
+  // The panel shows the model the role runs with — not the agent name — and "unknown" when nothing is set.
   const lines = plain(draw(withEnv, { tab: 1, selected: 'bot' }, 96, 40))
-  assert.ok(lines.some(line => line.includes('claude opus-4-8')))
-  assert.ok(!lines.join('\n').includes('claude default'))
+  assert.ok(lines.some(line => line.includes('opus-4-8')))
+  assert.ok(!lines.join('\n').includes('unknown'), 'a configured model is not "unknown"')
+  const unset = plain(draw(modelOf({ ...base, env: {} }), { tab: 1, selected: 'bot' }, 96, 40))
+  assert.ok(unset.some(line => line.includes('unknown')), 'an unset model shows "unknown"')
 })
 
 
