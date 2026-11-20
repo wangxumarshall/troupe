@@ -20,6 +20,7 @@ const COMMANDS: [string, string][] = [
   ['wait', 'wait for a role result, readiness or a gate answer'],
   ['stage', 'set the mission\'s current stage'],
   ['gate', 'ask the person a question in the panel'],
+  ['answer', 'answer a gate (approve or change) from the orchestrator'],
   ['teardown', 'remove mission panes, role worktrees and branches'],
   ['close', 'close a role\'s window, or the mission'],
 ]
@@ -36,7 +37,7 @@ const usage = () =>
     '                        else the mission branch checked out here)',
     '  setup [--remove] · mission new <name> [--base <ref>] · open [--planning]',
     '  up -m <mission> [--orch claude|codex]',
-    '  gate <id> ["question"] [--no-wait] · stage <id>',
+    '  gate <id> ["question"] [--no-wait] · answer <gate> approve|change [text…] · stage <id>',
     '  dispatch <role> · send <role> <text…> (or stdin)',
     '  status [--json] [--watch] · close <role> | --all',
     '  panel [--once] [--plain] [--no-anim] [--width N --height N]',

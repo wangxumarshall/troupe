@@ -20,7 +20,7 @@ import { createPanel, openPanel } from './panel-open.ts'
 
 const OPTIONS: Record<string, string[]> = {
   setup: ['remove'], open: ['planning'], up: ['orch'], mission: ['base'], check: [], approve: [], gate: ['no-wait'], stage: [],
-  dispatch: [], status: ['json', 'watch'], send: [], wait: ['role', 'gate', 'timeout', 'ready'], teardown: ['force'], close: ['all'], panel: ['once', 'plain', 'width', 'height', 'no-anim'],
+  dispatch: [], status: ['json', 'watch'], send: [], wait: ['role', 'gate', 'timeout', 'ready'], teardown: ['force'], close: ['all'], answer: [], panel: ['once', 'plain', 'width', 'height', 'no-anim'],
 }
 
 const parsed = (command: string, args: string[]) => {
@@ -241,6 +241,7 @@ export const execute = async (command: string, args: string[], overrides: Partia
     if (command === 'approve') count(pos, 0, 0, 'approve')
     else if (command === 'dispatch' || command === 'stage') count(pos, 1, 1, `${command} <name>`)
     else if (command === 'gate') count(pos, 1, 2, 'gate <id> ["question"] [--no-wait]')
+    else if (command === 'answer') count(pos, 2, Infinity, 'answer <gate> approve|change [text…]')
     else if (command === 'send') count(pos, 1, Infinity, 'send <role> <text…> (or text on stdin)')
     else if (command === 'close') count(pos, values.all ? 0 : 1, values.all ? 0 : 1, 'close <role> | --all')
     else if (command === 'teardown') count(pos, 0, 0, 'teardown [-m mission] [--force]')
@@ -251,7 +252,7 @@ export const execute = async (command: string, args: string[], overrides: Partia
       if (values.ready && values.role === undefined) throw new Usage('--ready requires --role')
       if (values.timeout !== undefined && (values.timeout.trim() === '' || !Number.isFinite(Number(values.timeout)) || Number(values.timeout) < 0)) throw new Usage('--timeout must be a nonnegative number of seconds')
     }
-    if (['dispatch', 'stage', 'gate', 'send'].includes(command) || (command === 'close' && !values.all)) id(pos[0], 'name')
+    if (['dispatch', 'stage', 'gate', 'send', 'answer'].includes(command) || (command === 'close' && !values.all)) id(pos[0], 'name')
     if (command === 'wait') id(values.role ?? values.gate, 'wait target')
     if (command === 'send' && pos.length === 1 && r.inputTTY) throw new Usage('send needs text arguments or text on stdin')
     if (command === 'status') return await status(r, want, !!values.json, !!values.watch)
@@ -270,6 +271,16 @@ export const execute = async (command: string, args: string[], overrides: Partia
       const gate = id(pos[0], 'gate')
       append(m.log, 'cli', { ev: 'gate-open', gate, ...(pos[1] === undefined ? {} : { ask: pos[1] }), ...(gate === PLAN_GATE ? { plan: m.hash } : {}) })
       return values['no-wait'] ? { code: 0, out: `Opened gate ${gate}\n` } : await wait(r, m, { gate })
+    }
+    // The orchestrator answers its own gate from its window, so the person never has to leave the chat for the panel.
+    if (command === 'answer') {
+      const gate = id(pos[0], 'gate')
+      const answer = pos[1]
+      if (answer !== 'approve' && answer !== 'change') throw new Usage('answer <gate> approve|change [text…]')
+      const text = answer === 'change' ? String(pos.slice(2).join(' ')).trim() : ''
+      if (answer === 'change' && text === '') throw new Usage('change needs text')
+      append(m.log, 'cli', { ev: 'gate-answer', gate, answer, ...(text === '' ? {} : { text }), ...(gate === PLAN_GATE ? { plan: m.hash } : {}) })
+      return { code: 0, out: `${answer === 'approve' ? 'Approved' : 'Change sent for'} ${gate}\n` }
     }
     if (command === 'send') {
       const text = pos.length > 1 ? pos.slice(1).join(' ') : r.inputTTY ? '' : await r.input()

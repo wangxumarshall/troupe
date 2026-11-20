@@ -24,7 +24,11 @@ troupe types one line into your session (`Role api finished: done: …`,
 `mr-ok approved in the panel. …`, `Role api was answered in its window and
 went on working.`, `Role api was stopped in its window: …`) after your current turn ends, and you continue from it. It knows your session from the troupe commands
 you run, so run them from this session. Never `sleep` to wait.
-`troupe gate --no-wait` opens a gate without blocking; `troupe wait` is
+A gate is answered in the chat, not the panel: you open it with
+`troupe gate <id> "<one line>" --no-wait`, ask the person in a few plain
+lines, and on their answer run `troupe answer <gate> approve` or
+`troupe answer <gate> change "<words>"`. The panel still shows the gate for
+reference; the person never has to leave the chat for it. `troupe wait` is
 for when you need an answer within the same turn.
 
 How far to read, how to split, what to ask and how long your messages are
@@ -97,11 +101,12 @@ worktree (`git -C <worktree> add` and `commit`).
 
 Tell the person in a few plain lines what they are approving, the decisions
 with your recommendations, and who runs each role. Then run
-`troupe gate plan "<one line>"`. The panel shows the plan gate: `a` approves
-(and takes your recommendations), `c` sends their words back to you as
-`change: <words>`, which sends you back to step 2: edit, check, commit, gate
-again. Any later edit of `plan.md` or of a role text it references needs
-approval again before the next dispatch.
+`troupe gate plan "<one line>" --no-wait` and ask them in the chat: they type
+`a` to approve (taking your recommendations) or `c <words>` to change. You
+record it with `troupe answer plan approve` or
+`troupe answer plan change "<words>"`, which sends you back to step 2: edit,
+check, commit, gate again. Any later edit of `plan.md` or of a role text it
+references needs approval again before the next dispatch.
 
 ## 4. Build
 
@@ -142,18 +147,20 @@ the role's old result aside first, so its next result is news again.
 
 When every role is merged: `troupe stage mr-ok`, then
 `troupe gate mr-ok "<what the MR delivers; open findings with your
-recommendation>"`. Nothing is pushed before `approve`. A change sends you to
-the fix loop or the plan.
+recommendation>" --no-wait`, ask the person in the chat, and record their
+`a`/`c` with `troupe answer mr-ok approve|change "<words>"`. Nothing is
+pushed before `approve`. A change sends you to the fix loop or the plan.
 
 ## 7. Open the MR, then gate: merged?
 
 `troupe stage mr`; push the mission branch (`git -C <worktree> push`) and
 open one MR against the base branch, per the project's conventions. A
 refused push: tell the person and stop. Then `troupe stage merged` and
-`troupe gate merged "<the MR link>"`, and leave every role window open:
-only a person merges the MR, and until they do, a change they ask for goes
-to the same builder's window, then is pushed to the same MR. Opening the
-MR does not finish the mission.
+`troupe gate merged "<the MR link>" --no-wait`, ask the person in the chat,
+and record their `a`/`c` with `troupe answer merged approve|change`. Leave
+every role window open: only a person merges the MR, and until they do, a
+change they ask for goes to the same builder's window, then is pushed to the
+same MR. Opening the MR does not finish the mission.
 
 ## 8. Teardown once merged
 
